@@ -7,6 +7,7 @@ class id3:
         self.tree = None
 
 
+    #计算信息熵
     def calEntropy(self,y):
         num = y.shape[0]
         labelCounts = {}
@@ -23,6 +24,7 @@ class id3:
         return entropy
 
 
+    #切分数据集,返回特征下标为index,特征值为value的数据集
     def splitDataset(self,X,y,index,value):
         ret = []
         featVec = X[:,index]
@@ -34,11 +36,12 @@ class id3:
         return X[ret,:],y[ret]
 
 
+    #选择最佳分割特征
     def chooseBestFeatureToSplit(self,X,y):
-        numFeatures = X.shape[1]
-        oldEntropy = self.calEntropy(y)
-        bestInfoGain = 0.0
-        bestFeatureIndex = -1
+        numFeatures = X.shape[1]   #特征个数
+        oldEntropy = self.calEntropy(y)   #原数据集的信息熵
+        bestInfoGain = 0.0     #分割后数据的信息熵
+        bestFeatureIndex = -1  #信息增益最大时,分割特征的下标
 
         for i in range(numFeatures):
             featList = X[:,i]
@@ -58,6 +61,7 @@ class id3:
         return bestFeatureIndex
 
 
+    #返回labelList中出现次数最多的label
     def majorityCnt(self,labelList):
         labelCount = {}
         for vote in labelList:
@@ -69,14 +73,21 @@ class id3:
         return sortedClassCount[0][0]
 
 
+    #建立决策树
     def createTree(self,X,y,featureIndex):
         labelList = list(y)
+
+        #所有label相同,停止分割,返回该label
         if labelList.count(labelList[0]) == len(labelList):
             return labelList[0]
+
+        #没有特征可以分割,停止分割,返回出现次数最多的label
         if len(featureIndex) == 0:
             return self.majorityCnt(labelList)
 
+        #确定最佳分割特征
         bestFeatIndex = self.chooseBestFeatureToSplit(X,y)
+
         bestFeatStr = featureIndex[bestFeatIndex]
         featureIndex = list(featureIndex)
         featureIndex.remove(bestFeatStr)
@@ -92,7 +103,8 @@ class id3:
 
         return myTree
 
-
+    
+    #训练
     def fit(self,X,y):
         if isinstance(X,np.ndarray) and isinstance(y,np.ndarray):
             pass
@@ -107,7 +119,8 @@ class id3:
         self.tree = self.createTree(X,y,featureIndex)
         return self
 
-
+    
+    #预测
     def predict(self,X):
         if self.tree == None:
             raise NotImplementedError("Estimator not fitted,call 'fit' first")
