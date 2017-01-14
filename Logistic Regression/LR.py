@@ -43,35 +43,3 @@ def classify(testdir,weight):
 				error += 1
 				print 'error'
 	print 'error rate is:','%.4f' %(erorr/m)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
